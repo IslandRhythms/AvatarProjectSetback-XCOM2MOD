@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>9d8cd4d4-22dc-4741-8ab6-2846ae3bf86a</Guid>
+    <Name>AvatarProjectSetback</Name>
+    <Description>This mod simply removes 2 ticks from the avatar project when you permanently defeat a chosen.</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>AvatarProjectSetback</AssemblyName>
+    <RootNamespace>AvatarProjectSetback</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Src\AvatarProjectSetback\" />
+    <Folder Include="Src\AvatarProjectSetback\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ModPreview.jpg">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReadMe.txt" />
+    <Content Include="Config\XComEditor.ini" />
+    <Content Include="Config\XComEngine.ini" />
+    <Content Include="Config\XComGame.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Src\AvatarProjectSetback\Classes\X2DownloadableContentInfo_AvatarProjectSetback.uc" />
+  </ItemGroup>
+  <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
+</Project>
