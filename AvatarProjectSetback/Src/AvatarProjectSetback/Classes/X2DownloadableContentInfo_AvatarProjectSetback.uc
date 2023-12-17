@@ -26,32 +26,42 @@ static event InstallNewCampaign(XComGameState StartState)
 
 static event OnPostMission() {
 	local XComGameState_BattleData BattleData;
+	local XComGameState_AdventChosen ChosenState;
 	local X2MissionTemplateManager MissionTemplateManager;
 	local X2MissionTemplate MissionTemplate;
 	local XComGameStateHistory History;
 	local XComGameState NewGameState;
 	local XComGameState_HeadquartersAlien AlienHQ;
 	local bool MissionSuccess;
-	local string obj;
+	local string obj, ChosenType;
+	local int i;
 	History = `XCOMHISTORY;
 	AlienHQ = XComGameState_HeadquartersAlien(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersAlien'));
 
 	BattleData = XComGameState_BattleData(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
+	// reports that some clauses aren't executing, so add a second clause that double checks everything
+	if (BattleData.ChosenRef.ObjectID == 0) {
+		return;
+	}
+	ChosenState = XComGameState_AdventChosen(`XCOMHISTORY.GetGameStateForObjectID(BattleData.ChosenRef.ObjectID));
+	ChosenType = string(ChosenState.GetMyTemplateName());
+	ChosenType = Split(ChosenType, "_", true);
+	// This should work because once the chosen is permanently defeated, we'll never encounter them again.
 	MissionTemplateManager = class'X2MissionTemplateManager'.static.GetMissionTemplateManager();
 	MissionTemplate = MissionTemplateManager.FindMissionTemplate(BattleData.MapData.ActiveMission.MissionName);
 	MissionSuccess = BattleData.bLocalPlayerWon && !BattleData.bMissionAborted;
 	obj = MissionTemplate.DisplayName;
-	if (MissionSuccess && obj == "Defeat Chosen Warlock") {
+	if (MissionSuccess && (obj == "Defeat Chosen Warlock" || (ChosenType == "Warlock" && BattleData.bChosenDefeated))) {
 		NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Subtract Doom Timer due to Chosen Defeat");
 		AlienHQ = XComGameState_HeadquartersAlien(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersAlien', AlienHQ.ObjectID));
 		AlienHQ.RemoveDoomFromFortress(NewGameState, 2, "Chosen Warlock Exterminated");
 		`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-		} else if (obj == "Defeat Chosen Assassin") {
+		} else if (MissionSuccess && (obj == "Defeat Chosen Assassin" || (ChosenType == "Assassin" && BattleData.bChosenDefeated))) {
 			NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Subtract Doom Timer due to Chosen Defeat");
 			AlienHQ = XComGameState_HeadquartersAlien(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersAlien', AlienHQ.ObjectID));
 			AlienHQ.RemoveDoomFromFortress(NewGameState, 2, "Chosen Assassin Exterminated");
 			`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-		} else if (obj == "Defeat Chosen Hunter") {
+		} else if (MissionSuccess && (obj == "Defeat Chosen Hunter" || (ChosenType == "Hunter" && BattleData.bChosenDefeated))) {
 			NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Subtract Doom Timer due to Chosen Defeat");
 			AlienHQ = XComGameState_HeadquartersAlien(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersAlien', AlienHQ.ObjectID));
 			AlienHQ.RemoveDoomFromFortress(NewGameState, 2, "Chosen Hunter Exterminated");
